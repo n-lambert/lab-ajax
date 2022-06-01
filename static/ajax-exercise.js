@@ -17,20 +17,17 @@ document.querySelector('#get-fortune-button').addEventListener('click', showFort
 function showWeather(evt) {
   evt.preventDefault();
 
-  // const url = '/weather.json';
   const zipcode = document.querySelector('#zipcode-field').value;
 
-const queryString = new URLSearchParams({zipcode:zipcode}).toString();
-const url = `/weather.json?${queryString}`
+  const queryString = new URLSearchParams({'zipcode':zipcode}).toString();
+  const url = `/weather.json?${queryString}`
 
   fetch(url)
-  .then((response) => response.text())
-  .then((weather) => {
-    document.querySelector('#weather-info').innerHTML = weather;
+  .then((response) => response.json())
+  .then((responseJson) => {
+    document.querySelector('#weather-info').innerHTML = responseJson['forecast'];
   });
-
-  // TODO: request weather with that URL and show the forecast in #weather-info
-}
+};
 
 document.querySelector('#weather-form').addEventListener('submit', showWeather);
 
@@ -38,7 +35,23 @@ document.querySelector('#weather-form').addEventListener('submit', showWeather);
 
 function orderMelons(evt) {
   evt.preventDefault();
-
+  
+  const formInputs = {
+    melon_type: document.querySelector('#melon-type-field').value,
+    qty: document.querySelector('#qty-field').value,
+  };
+  
+  fetch('/order-melons.json', {
+    method: 'POST',
+    body: JSON.stringify(formInputs),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then((response) => response.json())
+  .then((responseJson) => {
+    document.querySelector('#order-status').innerHTML = `${responseJson['code']} ${responseJson['msg']}`
+  });
   // TODO: show the result message after your form
   // TODO: if the result code is ERROR, make it show up in red (see our CSS!)
 }
